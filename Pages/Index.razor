@@ -1,0 +1,63 @@
+﻿@page "/"
+@using HelloBlazor.Models
+@using HelloBlazor.Data
+@inject MessageService messageService
+
+@code {
+    List<Message> messages;
+    string messageId;
+    string name;
+    Message message;
+    bool inserted = false;
+    protected override async Task OnInitializedAsync()
+    {        
+        messages = await messageService.GetMessageList();
+    }
+
+    protected async Task Insert()
+    {
+
+        Message m = new Message()
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = name
+        };
+
+        await messageService.InsertMessageAsync(m);
+        messages = await messageService.GetMessageList();
+        inserted = true;
+    }
+}
+
+<h1>Enter your name</h1>
+
+<input placeholder="..." @bind="@name" />
+<br />
+<button @onclick="@Insert" class="btn btn-warning">Insert</button>
+<br />
+<br />
+@if (messages == null)
+{
+<p><em>Loading...</em></p>
+}
+else if(inserted == true)
+{
+<h1>Find your name</h1>
+<table class='table'>
+    <thead>
+        <tr>
+            @*<th>ID</th>*@
+            <th>Name</th>            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var mes in messages)
+            {
+        <tr>
+            @*<td>@mes.Id</td>*@
+            <td>@mes.Name</td>
+        </tr>
+            }
+    </tbody>
+</table>
+}
